@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HAYSIMO — Naturally Sourced, Purely Bottled</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+<style>
+  /* ===== CSS VARIABLES ===== */
+  :root {
+    --blue-deep: #0a2a4a;
+    --blue-mid: #1a5276;
+    --blue-light: #2e86c1;
+    --blue-sky: #5dade2;
+    --aqua: #a8d8ea;
+    --white: #f5faff;
+    --pure-white: #ffffff;
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --text-dark: #0a2233;
+    --text-muted: #5a7a9a;
+    --glass-bg: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.15);
+    --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--blue-deep);
+    color: var(--white);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ===== CUSTOM CURSOR ===== */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--aqua);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transition: transform 0.2s ease, width 0.2s, height 0.2s;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ===== GLOBAL NOISE TEXTURE ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ===== PAGES ===== */
+  .page { display: none; min-height: 100vh; position: relative; }
+  .page.active { display: block; animation: pageFadeIn 0.6s ease; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 0 5%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(10,42,74,0.98) 0%, rgba(10,42,74,0) 100%);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: var(--transition);
+  }
+  nav.scrolled {
+    background: rgba(10,42,74,0.97);
+    border-bottom-color: rgba(201,168,76,0.2);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .nav-logo img {
+    height: 44px;
+    filter: brightness(10) saturate(0);
+    transition: filter 0.3s;
+  }
+  .nav-logo:hover img { filter: brightness(1) saturate(1); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 4px;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 1px;
+    background: var(--gold);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--pure-white); }
+  .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+  .nav-cta {
+    background: var(--gold);
+    color: var(--blue-deep) !important;
+    padding: 9px 22px !important;
+    border-radius: 2px;
+    font-weight: 700 !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.18em !important;
+    transition: background 0.3s, color 0.3s !important;
+  }
+  .nav-cta::after { display: none !important; }
+  .nav-cta:hover { background: var(--gold-light) !important; }
+
+  /* Hamburger */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .hamburger span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--white);
+    transition: var(--transition);
+  }
+  .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,42,74,0.97);
+    backdrop-filter: blur(20px);
+    z-index: 999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+  .mobile-menu.open { display: flex; animation: pageFadeIn 0.3s ease; }
+  .mobile-menu a {
+    font-size: 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .mobile-menu a:hover { color: var(--gold); }
+
+  /* ===== SECTION BASE ===== */
+  section { position: relative; z-index: 1; }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 5% 80px;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #040e1a 0%, #0a2a4a 40%, #0d3a6e 70%, #0a2a4a 100%);
+  }
+  .hero-bg-img {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://haysimowater.com/wp-content/uploads/2025/04/Cover-2.png');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.05;
+    mix-blend-mode: luminosity;
+  }
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+  .hero-orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #2e86c1, transparent); top: -100px; left: -100px; }
+  .hero-orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #c9a84c, transparent); bottom: -50px; right: -50px; animation-delay: -4s; }
+  @keyframes orbFloat { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,-30px); } }
+
+  .hero-content { position: relative; z-index: 2; text-align: center; max-width: 900px; }
+  .hero-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: slideUp 0.8s ease 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--pure-white);
+    opacity: 0;
+    animation: slideUp 0.8s ease 0.4s forwards;
+  }
+  .hero-title span { color: var(--aqua); font-style: italic; }
+  .hero-sub {
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin: 20px 0 40px;
+    opacity: 0;
+    animation: slideUp 0.8s ease 0.6s forwards;
+  }
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: slideUp 0.8s ease 0.8s forwards;
+  }
+
+  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--blue-deep);
+    padding: 15px 36px;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--pure-white);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-primary:hover { color: var(--blue-deep); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--pure-white);
+    padding: 15px 36px;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Scroll indicator */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: slideUp 0.8s ease 1.2s forwards;
+  }
+  .scroll-indicator span {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse { 0%,100% { transform: scaleY(1); opacity: 0.5; } 50% { transform: scaleY(0.6); opacity: 1; } }
+
+  /* ===== SECTION TITLES ===== */
+  .section-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--pure-white);
+  }
+  .section-title em { color: var(--aqua); font-style: italic; }
+  .section-divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    margin: 20px 0;
+  }
+
+  /* ===== FEATURES STRIP ===== */
+  .features-strip {
+    background: linear-gradient(90deg, rgba(46,134,193,0.08), rgba(10,42,74,0.5));
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 28px 5%;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    overflow: hidden;
+  }
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 32px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    flex: 1;
+    min-width: 200px;
+  }
+  .feature-item:last-child { border-right: none; }
+  .feature-icon {
+    width: 36px; height: 36px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .feature-text .ft { font-size: 0.75rem; font-weight: 600; color: var(--white); }
+  .feature-text .fs { font-size: 0.62rem; color: var(--text-muted); letter-spacing: 0.05em; }
+
+  /* ===== PRODUCTS SECTION ===== */
+  .products-grid-section {
+    padding: 100px 5%;
+    background: linear-gradient(180deg, #0a2a4a 0%, #061825 100%);
+  }
+  .products-intro { text-align: center; margin-bottom: 70px; }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-card {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    background: linear-gradient(145deg, rgba(26,82,118,0.3), rgba(10,42,74,0.6));
+    border: 1px solid rgba(255,255,255,0.07);
+    cursor: pointer;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    aspect-ratio: 3/4;
+  }
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.2);
+  }
+  .product-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .product-card:hover img { transform: scale(1.06); }
+  .product-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,42,74,0.95) 0%, rgba(10,42,74,0.1) 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px;
+  }
+  .product-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--pure-white);
+    margin-bottom: 8px;
+  }
+  .product-card-link {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: gap 0.3s;
+    cursor: pointer;
+  }
+  .product-card:hover .product-card-link { gap: 14px; }
+
+  /* ===== BRAND STORY ===== */
+  .brand-story {
+    padding: 120px 5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .story-visual {
+    position: relative;
+  }
+  .story-img-main {
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    aspect-ratio: 4/5;
+    position: relative;
+  }
+  .story-img-main img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: saturate(0.7) brightness(0.9);
+  }
+  .story-img-float {
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    width: 55%;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 4px solid var(--blue-deep);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .story-img-float img { width: 100%; height: 100%; object-fit: cover; }
+  .story-stat {
+    position: absolute;
+    top: 30px;
+    left: -20px;
+    background: var(--gold);
+    color: var(--blue-deep);
+    padding: 16px 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .story-stat .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .story-stat .lbl {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  .story-content .section-divider { margin: 20px 0 30px; }
+  .story-text {
+    font-size: 0.9rem;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 20px;
+  }
+  .story-pillars {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .pillar {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid var(--gold);
+    transition: background 0.3s;
+  }
+  .pillar:hover { background: rgba(255,255,255,0.06); }
+  .pillar-icon { font-size: 1.4rem; }
+  .pillar-title { font-size: 0.8rem; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .pillar-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* ===== GALLERY MARQUEE ===== */
+  .gallery-section { padding: 80px 0; overflow: hidden; }
+  .gallery-track {
+    display: flex;
+    gap: 20px;
+    animation: marquee 25s linear infinite;
+    width: max-content;
+  }
+  .gallery-track:hover { animation-play-state: paused; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .gallery-item {
+    width: 320px; height: 220px;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  .gallery-item:hover img { transform: scale(1.05); }
+  .gallery-section-header { text-align: center; padding: 0 5% 50px; }
+
+  /* ===== CTA BANNER ===== */
+  .cta-banner {
+    margin: 0 5% 100px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    padding: 80px 60px;
+    background: linear-gradient(120deg, #0d3a6e 0%, #1a5276 50%, #0a2a4a 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .cta-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('https://haysimowater.com/wp-content/uploads/2025/04/Haysimo-banner-06.png');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.15;
+    mix-blend-mode: screen;
+  }
+  .cta-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+  .cta-text .cta-label { font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .cta-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    line-height: 1.2;
+  }
+  .cta-text p { font-size: 0.85rem; color: rgba(255,255,255,0.6); max-width: 500px; margin-top: 14px; line-height: 1.7; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: #040e1a;
+    padding: 70px 5% 30px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 50px;
+    margin-bottom: 50px;
+  }
+  .footer-brand img {
+    height: 50px;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+  .footer-brand p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.8; max-width: 300px; }
+  .footer-col h4 {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul li a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .footer-col ul li a:hover { color: var(--white); }
+  .footer-contact-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .footer-contact-icon { color: var(--gold); font-size: 14px; margin-top: 2px; }
+  .footer-contact-text { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+  .footer-subscribe {
+    display: flex;
+    margin-top: 6px;
+  }
+  .footer-subscribe input {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-right: none;
+    padding: 10px 14px;
+    color: var(--white);
+    font-size: 0.78rem;
+    font-family: 'Montserrat', sans-serif;
+    outline: none;
+  }
+  .footer-subscribe input::placeholder { color: var(--text-muted); }
+  .footer-subscribe button {
+    background: var(--gold);
+    color: var(--blue-deep);
+    border: none;
+    padding: 10px 16px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    transition: background 0.3s;
+  }
+  .footer-subscribe button:hover { background: var(--gold-light); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-bottom p { font-size: 0.72rem; color: var(--text-muted); }
+  .footer-social { display: flex; gap: 14px; }
+  .social-btn {
+    width: 34px; height: 34px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--text-muted);
+    transition: border-color 0.3s, color 0.3s, background 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .social-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+
+  /* ========== ABOUT PAGE ========== */
+  .about-hero {
+    min-height: 60vh;
+    display: flex;
+    align-items: flex-end;
+    padding: 160px 5% 80px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #040e1a 0%, #0a2a4a 60%);
+  }
+  .about-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://haysimowater.com/wp-content/uploads/2025/04/Haysimo-banner-06.png');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.05;
+  }
+  .about-hero-content { position: relative; z-index: 1; max-width: 700px; }
+  .about-hero-content h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 300;
+    line-height: 1.05;
+  }
+  .about-hero-content h1 em { color: var(--aqua); font-style: italic; }
+  .about-hero-content p { font-size: 0.9rem; color: rgba(255,255,255,0.55); max-width: 500px; margin-top: 20px; line-height: 1.8; }
+
+  .about-mission {
+    padding: 100px 5%;
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .mission-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.2;
+    margin: 14px 0 20px;
+  }
+  .mission-text p { font-size: 0.88rem; color: rgba(255,255,255,0.6); line-height: 1.9; margin-bottom: 16px; }
+  .mission-visual {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .mission-img {
+    border-radius: 4px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    position: relative;
+  }
+  .mission-img img { width: 100%; height: 100%; object-fit: cover; }
+  .mission-img:first-child {
+    grid-column: span 2;
+    aspect-ratio: 16/9;
+  }
+  .about-values {
+    padding: 80px 5%;
+    background: linear-gradient(180deg, #061825 0%, #0a2a4a 100%);
+  }
+  .about-values-inner { max-width: 1200px; margin: 0 auto; }
+  .about-values-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+  .value-card {
+    padding: 50px 36px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.3s, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .value-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .value-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(201,168,76,0.15); }
+  .value-card:hover::before { transform: scaleX(1); }
+  .value-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem;
+    font-weight: 300;
+    color: rgba(201,168,76,0.15);
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+  .value-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+  .value-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+
+  .about-timeline {
+    padding: 100px 5%;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .about-timeline h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .timeline { position: relative; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    transform: translateX(-50%);
+  }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    width: 12px; height: 12px;
+    background: var(--gold);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.2);
+  }
+  .timeline-item:nth-child(even) .tl-content { grid-column: 2; }
+  .timeline-item:nth-child(odd) .tl-empty { grid-column: 2; }
+  .timeline-item:nth-child(even) .tl-empty { grid-column: 1; grid-row: 1; }
+  .tl-year {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .tl-title { font-size: 1rem; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+  .tl-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+
+  /* ========== PRODUCTS PAGE ========== */
+  .page-hero-sm {
+    min-height: 45vh;
+    display: flex;
+    align-items: flex-end;
+    padding: 160px 5% 70px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-hero-sm-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #040e1a 0%, #0a2a4a 60%);
+  }
+  .page-hero-sm-img {
+    position: absolute; inset: 0;
+    background-image: url('https://haysimowater.com/wp-content/uploads/2025/04/PRODUCT-PRESENTATION-01.png');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.15;
+  }
+  .page-hero-sm-content { position: relative; z-index: 1; }
+  .page-hero-sm-content h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 300;
+  }
+  .page-hero-sm-content h1 em { color: var(--aqua); font-style: italic; }
+  .page-hero-sm-content p { font-size: 0.85rem; color: rgba(255,255,255,0.5); max-width: 500px; margin-top: 14px; line-height: 1.7; }
+
+  .products-full-section {
+    padding: 80px 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .products-full-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  .prod-full-card {
+    background: linear-gradient(145deg, rgba(26,82,118,0.2), rgba(10,42,74,0.4));
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform 0.4s, box-shadow 0.4s;
+  }
+  .prod-full-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,168,76,0.15);
+  }
+  .prod-img-wrap {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0d3a6e, #0a2a4a);
+    position: relative;
+  }
+  .prod-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  .prod-full-card:hover .prod-img-wrap img { transform: scale(1.05); }
+  .prod-badge {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: var(--gold);
+    color: var(--blue-deep);
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 5px 10px;
+  }
+  .prod-info { padding: 28px; }
+  .prod-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .prod-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+  .prod-specs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .spec-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-muted);
+  }
+  .prod-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    cursor: pointer;
+    transition: gap 0.3s;
+  }
+  .prod-full-card:hover .prod-action { gap: 14px; }
+
+  /* ========== CONTACT PAGE ========== */
+  .contact-layout {
+    padding: 100px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .contact-info h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.2;
+    margin: 14px 0 24px;
+  }
+  .contact-info p { font-size: 0.86rem; color: rgba(255,255,255,0.55); line-height: 1.8; margin-bottom: 40px; }
+  .contact-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 28px;
+    padding: 20px;
+    background: rgba(255,255,255,0.02);
+    border-left: 2px solid var(--gold);
+    transition: background 0.3s;
+  }
+  .contact-detail:hover { background: rgba(255,255,255,0.05); }
+  .contact-icon {
+    width: 42px; height: 42px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .contact-detail-title { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; font-weight: 600; }
+  .contact-detail-text { font-size: 0.84rem; color: rgba(255,255,255,0.7); line-height: 1.6; }
+
+  .contact-form-wrap {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 50px 44px;
+  }
+  .form-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; margin-bottom: 30px; color: var(--white); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.84rem;
+    padding: 13px 16px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+  .form-group select { cursor: pointer; }
+  .form-group select option { background: var(--blue-deep); }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .form-submit {
+    width: 100%;
+    background: var(--gold);
+    color: var(--blue-deep);
+    border: none;
+    padding: 16px;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-submit::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--blue-deep);
+    transform: translateX(-100%);
+    transition: transform 0.4s;
+  }
+  .form-submit:hover::before { transform: translateX(0); }
+  .form-submit span { position: relative; z-index: 1; }
+  .form-submit:hover span { color: var(--gold); }
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    color: #5dade2;
+    font-size: 0.82rem;
+  }
+
+  /* ===== STATS ===== */
+  .stats-section {
+    padding: 80px 5%;
+    background: rgba(201,168,76,0.04);
+    border-top: 1px solid rgba(201,168,76,0.1);
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .stat-item { padding: 30px 20px; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1;
+  }
+  .stat-num span { color: var(--gold); }
+  .stat-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-top: 8px; }
+
+  /* ===== MAP SECTION ===== */
+  .map-section { padding: 0 5% 100px; }
+  .map-inner {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  .map-text h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; margin-bottom: 6px; }
+  .map-text p { font-size: 0.82rem; color: var(--text-muted); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1024px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .brand-story { grid-template-columns: 1fr; gap: 60px; }
+    .story-img-float { display: none; }
+    .about-mission { grid-template-columns: 1fr; }
+    .about-values-grid { grid-template-columns: 1fr 1fr; }
+    .contact-layout { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .timeline::before { display: none; }
+    .timeline-item { grid-template-columns: 1fr; gap: 0; }
+    .timeline-item::before { display: none; }
+    .timeline-item:nth-child(even) .tl-content { grid-column: 1; }
+    .timeline-item:nth-child(odd) .tl-empty { display: none; }
+    .timeline-item:nth-child(even) .tl-empty { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .footer-grid { grid-template-columns: 1fr; gap: 36px; }
+    .brand-story { padding: 80px 5%; }
+    .cta-banner { padding: 60px 30px; }
+    .cta-content { flex-direction: column; }
+    .about-values-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-row { grid-template-columns: 1fr; }
+    .contact-form-wrap { padding: 34px 24px; }
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+    .feature-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .features-strip { flex-direction: column; }
+  }
+
+  @media (max-width: 480px) {
+    .products-grid { grid-template-columns: 1fr; }
+    .hero-btns { flex-direction: column; align-items: center; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ===== ANIMATE ON SCROLL ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* Water drop loader */
+  .page-loader {
+    position: fixed;
+    inset: 0;
+    background: var(--blue-deep);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    transition: opacity 0.5s, visibility 0.5s;
+  }
+  .page-loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--white);
+  }
+  .loader-logo span { color: var(--gold); }
+  .loader-bar {
+    width: 200px;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+  .loader-progress {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    animation: load 1.5s ease forwards;
+  }
+  @keyframes load { to { width: 100%; } }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="page-loader" id="loader">
+  <div class="loader-logo">HAYS<span>IMO</span></div>
+  <div class="loader-bar"><div class="loader-progress"></div></div>
+</div>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a class="nav-logo" onclick="showPage('home')">
+    <img src="https://haysimowater.com/wp-content/uploads/2025/04/cropped-WhatsApp_Image_2025-04-02_at_12.04.42_PM-removebg-preview-138x56.png" alt="Haysimo" />
+  </a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')" class="active" id="nav-home">Home</a></li>
+    <li><a onclick="showPage('about')" id="nav-about">About Us</a></li>
+    <li><a onclick="showPage('products')" id="nav-products">Products</a></li>
+    <li><a onclick="showPage('contact')" id="nav-contact" class="nav-cta">Contact</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="showPage('home'); toggleMenu()">Home</a>
+  <a onclick="showPage('about'); toggleMenu()">About Us</a>
+  <a onclick="showPage('products'); toggleMenu()">Products</a>
+  <a onclick="showPage('contact'); toggleMenu()">Contact</a>
+</div>
+
+<!-- ===================== HOME PAGE ===================== -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-bg-img"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Bossaso, Puntland · Somalia</div>
+      <h1 class="hero-title">Pure Water,<br><span>Pure Life</span></h1>
+      <p class="hero-sub">Naturally Sourced &nbsp;·&nbsp; Mineral Rich &nbsp;·&nbsp; 100% Somali</p>
+      <div class="hero-btns">
+        <a class="btn-primary" onclick="showPage('products')"><span>Explore Products</span></a>
+        <a class="btn-outline" onclick="showPage('about')">Our Story</a>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- FEATURES STRIP -->
+  <div class="features-strip">
+    <div class="feature-item">
+      <div class="feature-icon">💧</div>
+      <div class="feature-text"><div class="ft">Deep Underground Source</div><div class="fs">Untouched by pollution</div></div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">⚗️</div>
+      <div class="feature-text"><div class="ft">Mineral-Rich</div><div class="fs">Essential electrolytes</div></div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🏔️</div>
+      <div class="feature-text"><div class="ft">100% Somali Origin</div><div class="fs">Locally sourced & bottled</div></div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">✅</div>
+      <div class="feature-text"><div class="ft">Quality Certified</div><div class="fs">Rigorously tested</div></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS PREVIEW -->
+  <section class="products-grid-section">
+    <div class="products-intro reveal">
+      <div class="section-label">Our Products</div>
+      <h2 class="section-title">Feel the <em>Hydration</em></h2>
+      <div class="section-divider" style="margin: 20px auto;"></div>
+    </div>
+    <div class="products-grid">
+      <div class="product-card reveal reveal-delay-1">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-3.png" alt="Combo Pack" />
+        <div class="product-overlay">
+          <div class="product-card-title">BTC Combo Pack</div>
+          <a class="product-card-link" onclick="showPage('products')">View Product <span>→</span></a>
+        </div>
+      </div>
+      <div class="product-card reveal reveal-delay-2">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-1.png" alt="500ml" />
+        <div class="product-overlay">
+          <div class="product-card-title">12 × 500ml</div>
+          <a class="product-card-link" onclick="showPage('products')">View Product <span>→</span></a>
+        </div>
+      </div>
+      <div class="product-card reveal reveal-delay-3">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-.png" alt="1.5ltr" />
+        <div class="product-overlay">
+          <div class="product-card-title">6 × 1.5 Litre</div>
+          <a class="product-card-link" onclick="showPage('products')">View Product <span>→</span></a>
+        </div>
+      </div>
+      <div class="product-card reveal reveal-delay-4">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-2.png" alt="250ml" />
+        <div class="product-overlay">
+          <div class="product-card-title">24 × 250ml</div>
+          <a class="product-card-link" onclick="showPage('products')">View Product <span>→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRAND STORY PREVIEW -->
+  <section style="background: linear-gradient(180deg, #061825 0%, #0a2a4a 100%); padding: 20px 0 0;">
+    <div class="brand-story">
+      <div class="story-visual reveal">
+        <div class="story-img-main">
+          <img src="https://haysimowater.com/wp-content/uploads/2025/04/PRODUCT-PRESENTATION-01.png" alt="Haysimo Product" />
+        </div>
+        <div class="story-img-float">
+          <img src="https://haysimowater.com/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-07-at-2.08.02-PM.jpeg" alt="Haysimo" />
+        </div>
+        <div class="story-stat">
+          <div class="num">100%</div>
+          <div class="lbl">Somali Pride</div>
+        </div>
+      </div>
+      <div class="story-content reveal">
+        <div class="section-label">Our Story</div>
+        <h2 class="section-title">Born from the<br><em>Heart of Somalia</em></h2>
+        <div class="section-divider"></div>
+        <p class="story-text">Haysimo Water is more than hydration — it's a statement of pride, purity, and progress. Drawn from deep underground sources in Puntland, untouched by pollution and rich with natural minerals.</p>
+        <div class="story-pillars">
+          <div class="pillar">
+            <div class="pillar-icon">🌿</div>
+            <div>
+              <div class="pillar-title">Naturally Sourced, Purely Bottled</div>
+              <div class="pillar-desc">Our water is drawn from deep underground sources, untouched by pollution and rich in natural minerals.</div>
+            </div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">🇸🇴</div>
+            <div>
+              <div class="pillar-title">100% Somali, 100% Proud</div>
+              <div class="pillar-desc">Every bottle celebrates Somali purity and resilience — locally sourced, proudly produced.</div>
+            </div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">⚡</div>
+            <div>
+              <div class="pillar-title">Mineral-Rich Hydration</div>
+              <div class="pillar-desc">Essential minerals that fuel your body with more than just hydration — strength, vitality, and balance.</div>
+            </div>
+          </div>
+        </div>
+        <a class="btn-outline" onclick="showPage('about')">Read Full Story</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery-section" style="background: #061825;">
+    <div class="gallery-section-header reveal">
+      <div class="section-label">Gallery</div>
+      <h2 class="section-title">Every Drop,<br><em>A Story</em></h2>
+    </div>
+    <div class="gallery-track" id="galleryTrack">
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/Haysimo-banner-06.png" alt="Banner" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/PRODUCT-PRESENTATION-01.png" alt="Product" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-07-at-2.08.02-PM.jpeg" alt="Haysimo" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-07-at-2.08.03-PM.jpeg" alt="Haysimo" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-1.png" alt="Product" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-.png" alt="Product" /></div>
+      <!-- Duplicate for seamless loop -->
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/Haysimo-banner-06.png" alt="Banner" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/PRODUCT-PRESENTATION-01.png" alt="Product" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-07-at-2.08.02-PM.jpeg" alt="Haysimo" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-07-at-2.08.03-PM.jpeg" alt="Haysimo" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-1.png" alt="Product" /></div>
+      <div class="gallery-item"><img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-.png" alt="Product" /></div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-num">4<span>+</span></div>
+        <div class="stat-label">Product Lines</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-num">100<span>%</span></div>
+        <div class="stat-label">Natural Source</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-num">0<span>%</span></div>
+        <div class="stat-label">Additives</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Somali Pride</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner reveal">
+    <div class="cta-content">
+      <div class="cta-text">
+        <div class="cta-label">Get in Touch</div>
+        <h2>Connect With Us <em style="font-style:italic; color:var(--aqua);">Today</em></h2>
+        <p>Proudly sourced from the heart of Somalia. Experience nature's freshness in every drop. Stay connected for updates, products, and more.</p>
+      </div>
+      <a class="btn-primary" onclick="showPage('contact')"><span>Get In Touch</span></a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/cropped-WhatsApp_Image_2025-04-02_at_12.04.42_PM-removebg-preview-138x56.png" alt="Haysimo" />
+        <p>Proudly sourced from the heart of Somalia, Haysimo delivers pure, mineral-rich hydration you can trust. Experience nature's freshness in every drop.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a onclick="showPage('home')">Home</a></li>
+          <li><a onclick="showPage('about')">About Haysimo</a></li>
+          <li><a onclick="showPage('products')">Our Products</a></li>
+          <li><a onclick="showPage('contact')">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📍</span>
+          <span class="footer-contact-text">Haysimo Water Plant<br>Bossaso, Puntland, Somalia</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📞</span>
+          <span class="footer-contact-text">444 1177<br>422 4477</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">✉️</span>
+          <span class="footer-contact-text">info@haysimowater.com</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Newsletter</h4>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">Don't miss our new launches! Subscribe today.</p>
+        <div class="footer-subscribe">
+          <input type="email" placeholder="Your email address" />
+          <button>Join</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 HAYSIMO WATER. All Rights Reserved.</p>
+      <div class="footer-social">
+        <a class="social-btn" href="#">f</a>
+        <a class="social-btn" href="#">in</a>
+        <a class="social-btn" href="#">𝕏</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ===================== ABOUT PAGE ===================== -->
+<div class="page" id="page-about">
+  <section class="about-hero">
+    <div class="about-hero-bg"></div>
+    <div class="about-hero-content">
+      <div class="section-label">Who We Are</div>
+      <h1>About <em>Haysimo</em><br>Water</h1>
+      <p>A celebration of Somali purity, resilience, and the power of nature — bottled for you.</p>
+    </div>
+  </section>
+
+  <section class="about-mission">
+    <div class="mission-text reveal">
+      <div class="section-label">Our Mission</div>
+      <h2>Bringing Nature's<br><em>Finest</em> to Your Table</h2>
+      <div class="section-divider"></div>
+      <p>At Haysimo, we believe water is more than a basic necessity — it's a reflection of the land it comes from. Our mission is to harness the incredible purity of Somalia's deep underground water reserves and bring it to homes and businesses across the region and beyond.</p>
+      <p>Every bottle of Haysimo is a testament to our commitment to quality, sustainability, and Somali pride. We source our water responsibly, bottle it with care, and deliver it with the promise that every sip is as nature intended.</p>
+      <div style="margin-top:30px;">
+        <a class="btn-primary" onclick="showPage('products')"><span>See Our Products</span></a>
+      </div>
+    </div>
+    <div class="mission-visual reveal">
+      <div class="mission-img">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/Haysimo-banner-06.png" alt="Haysimo" />
+      </div>
+      <div class="mission-img">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-07-at-2.08.02-PM.jpeg" alt="Haysimo" />
+      </div>
+      <div class="mission-img">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-07-at-2.08.03-PM.jpeg" alt="Haysimo" />
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="about-values">
+    <div class="about-values-inner">
+      <div class="reveal" style="text-align:center;">
+        <div class="section-label">What We Stand For</div>
+        <h2 class="section-title">Our Core <em>Values</em></h2>
+      </div>
+      <div class="about-values-grid">
+        <div class="value-card reveal">
+          <div class="value-num">01</div>
+          <div class="value-title">Purity First</div>
+          <div class="value-desc">We never compromise on the natural purity of our water. From source to bottle, every step maintains the integrity of what nature provides.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-1">
+          <div class="value-num">02</div>
+          <div class="value-title">Somali Pride</div>
+          <div class="value-desc">Every bottle celebrates our homeland. We are proud to be a Somali brand, built by Somalis, for Somalis and the world.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-2">
+          <div class="value-num">03</div>
+          <div class="value-title">Sustainability</div>
+          <div class="value-desc">We draw from nature responsibly, ensuring our water sources remain healthy and abundant for generations to come.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-1">
+          <div class="value-num">04</div>
+          <div class="value-title">Community</div>
+          <div class="value-desc">We invest in local communities, creating jobs, building infrastructure, and uplifting Puntland's economy through our operations.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-2">
+          <div class="value-num">05</div>
+          <div class="value-title">Transparency</div>
+          <div class="value-desc">We believe in honest business. Every label tells the truth. Our quality standards are rigorous and open to scrutiny.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-3">
+          <div class="value-num">06</div>
+          <div class="value-title">Excellence</div>
+          <div class="value-desc">We set the standard for premium water in East Africa. Excellence isn't a goal — it's our baseline expectation for everything we do.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="about-timeline">
+    <h2 class="section-title reveal">Our <em>Journey</em></h2>
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="tl-content">
+          <div class="tl-year">The Beginning</div>
+          <div class="tl-title">Founded in Bossaso</div>
+          <div class="tl-desc">Haysimo Water was established in the port city of Bossaso, Puntland — tapping into some of Somalia's richest underground water sources.</div>
+        </div>
+        <div class="tl-empty"></div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="tl-empty"></div>
+        <div class="tl-content">
+          <div class="tl-year">Product Launch</div>
+          <div class="tl-title">First Bottles Hit the Market</div>
+          <div class="tl-desc">Our initial product range — the 500ml and 1.5L bottles — launched across Puntland, quickly gaining recognition for exceptional taste and purity.</div>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="tl-content">
+          <div class="tl-year">Expansion</div>
+          <div class="tl-title">Broader Product Range</div>
+          <div class="tl-desc">We expanded our lineup to include the 250ml personal bottle and the BTC Combo Pack — bringing Haysimo to every occasion and need.</div>
+        </div>
+        <div class="tl-empty"></div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="tl-empty"></div>
+        <div class="tl-content">
+          <div class="tl-year">Today & Beyond</div>
+          <div class="tl-title">Growing with Somalia</div>
+          <div class="tl-desc">Today, Haysimo is one of Somalia's most trusted water brands, with ambitions to serve all of the Horn of Africa and beyond.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-banner reveal" style="margin: 0 5% 80px;">
+    <div class="cta-content">
+      <div class="cta-text">
+        <div class="cta-label">Ready to Hydrate?</div>
+        <h2>Explore Our <em style="font-style:italic; color:var(--aqua);">Products</em></h2>
+        <p>Discover the full range of Haysimo Water products — crafted to suit every lifestyle and occasion.</p>
+      </div>
+      <a class="btn-primary" onclick="showPage('products')"><span>View Products</span></a>
+    </div>
+  </div>
+
+  <!-- FOOTER (reuse) -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/cropped-WhatsApp_Image_2025-04-02_at_12.04.42_PM-removebg-preview-138x56.png" alt="Haysimo" />
+        <p>Proudly sourced from the heart of Somalia. Experience nature's freshness in every drop.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a onclick="showPage('home')">Home</a></li>
+          <li><a onclick="showPage('about')">About Haysimo</a></li>
+          <li><a onclick="showPage('products')">Our Products</a></li>
+          <li><a onclick="showPage('contact')">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📍</span>
+          <span class="footer-contact-text">Haysimo Water Plant<br>Bossaso, Puntland, Somalia</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">✉️</span>
+          <span class="footer-contact-text">info@haysimowater.com</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Newsletter</h4>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">Subscribe for updates & new launches.</p>
+        <div class="footer-subscribe">
+          <input type="email" placeholder="Your email" />
+          <button>Join</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 HAYSIMO WATER. All Rights Reserved.</p>
+      <div class="footer-social">
+        <a class="social-btn" href="#">f</a>
+        <a class="social-btn" href="#">in</a>
+        <a class="social-btn" href="#">𝕏</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ===================== PRODUCTS PAGE ===================== -->
+<div class="page" id="page-products">
+  <section class="page-hero-sm">
+    <div class="page-hero-sm-bg"></div>
+    <div class="page-hero-sm-img"></div>
+    <div class="page-hero-sm-content">
+      <div class="section-label">What We Offer</div>
+      <h1>Our <em>Products</em></h1>
+      <p>Haysimo Water — available in sizes crafted for every moment, every need, every occasion.</p>
+    </div>
+  </section>
+
+  <section class="products-full-section">
+    <div class="products-full-grid">
+      <!-- Product 1 -->
+      <div class="prod-full-card reveal">
+        <div class="prod-img-wrap">
+          <img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-3.png" alt="BTC Combo Pack" />
+          <div class="prod-badge">Best Value</div>
+        </div>
+        <div class="prod-info">
+          <div class="prod-name">HAYSIMO BTC Combo Pack</div>
+          <div class="prod-desc">Our ultimate value bundle — the perfect combination of sizes for families, offices, and events. Get the full Haysimo experience in one complete package.</div>
+          <div class="prod-specs">
+            <span class="spec-tag">Mixed Sizes</span>
+            <span class="spec-tag">Best Value</span>
+            <span class="spec-tag">Mineral Rich</span>
+          </div>
+          <div class="prod-action" onclick="showPage('contact')">Order Now <span>→</span></div>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="prod-full-card reveal reveal-delay-1">
+        <div class="prod-img-wrap">
+          <img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-1.png" alt="500ml" />
+          <div class="prod-badge">Most Popular</div>
+        </div>
+        <div class="prod-info">
+          <div class="prod-name">HAYSIMO 12 × 500ml</div>
+          <div class="prod-desc">The everyday essential. A case of 12 perfectly sized 500ml bottles — ideal for on-the-go hydration, work, school, or any active lifestyle.</div>
+          <div class="prod-specs">
+            <span class="spec-tag">12 Bottles</span>
+            <span class="spec-tag">500ml Each</span>
+            <span class="spec-tag">Natural Source</span>
+          </div>
+          <div class="prod-action" onclick="showPage('contact')">Order Now <span>→</span></div>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="prod-full-card reveal reveal-delay-2">
+        <div class="prod-img-wrap">
+          <img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-.png" alt="1.5ltr" />
+        </div>
+        <div class="prod-info">
+          <div class="prod-name">HAYSIMO 6 × 1.5 Litre</div>
+          <div class="prod-desc">More water, more value. Our 1.5 litre bottles are perfect for family dining, longer hydration throughout the day, or sharing at gatherings.</div>
+          <div class="prod-specs">
+            <span class="spec-tag">6 Bottles</span>
+            <span class="spec-tag">1.5L Each</span>
+            <span class="spec-tag">Family Size</span>
+          </div>
+          <div class="prod-action" onclick="showPage('contact')">Order Now <span>→</span></div>
+        </div>
+      </div>
+
+      <!-- Product 4 -->
+      <div class="prod-full-card reveal reveal-delay-3">
+        <div class="prod-img-wrap">
+          <img src="https://haysimowater.com/wp-content/uploads/2025/04/backgound-2.png" alt="250ml" />
+        </div>
+        <div class="prod-info">
+          <div class="prod-name">HAYSIMO 24 × 250ml</div>
+          <div class="prod-desc">Light, compact, and refreshing. 24 small-format bottles perfect for events, hospitality, catering, or wherever a personal-sized water is needed.</div>
+          <div class="prod-specs">
+            <span class="spec-tag">24 Bottles</span>
+            <span class="spec-tag">250ml Each</span>
+            <span class="spec-tag">Event Ready</span>
+          </div>
+          <div class="prod-action" onclick="showPage('contact')">Order Now <span>→</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY HAYSIMO -->
+  <section style="padding: 80px 5%; background: linear-gradient(180deg, #061825 0%, #0a2a4a 100%);">
+    <div style="max-width:1100px; margin:0 auto; text-align:center;">
+      <div class="section-label reveal">Why Choose Haysimo</div>
+      <h2 class="section-title reveal">More Than Just <em>Water</em></h2>
+      <div class="section-divider reveal" style="margin: 20px auto;"></div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-top:50px;">
+        <div class="value-card reveal">
+          <div style="font-size:2.5rem; margin-bottom:16px;">💧</div>
+          <div class="value-title">Deep Source</div>
+          <div class="value-desc">Extracted from pristine underground aquifers, far below the reach of surface contamination.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-1">
+          <div style="font-size:2.5rem; margin-bottom:16px;">⚗️</div>
+          <div class="value-title">Natural Minerals</div>
+          <div class="value-desc">Rich in calcium, magnesium, and essential electrolytes your body needs for peak performance.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-2">
+          <div style="font-size:2.5rem; margin-bottom:16px;">🏭</div>
+          <div class="value-title">Modern Bottling</div>
+          <div class="value-desc">State-of-the-art bottling facility ensures hygiene, consistency, and freshness from plant to hand.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-3">
+          <div style="font-size:2.5rem; margin-bottom:16px;">🌍</div>
+          <div class="value-title">Proudly Local</div>
+          <div class="value-desc">Built in Somalia, for Somalia. Every purchase supports local employment and economic growth.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-banner reveal" style="margin: 60px 5% 80px;">
+    <div class="cta-content">
+      <div class="cta-text">
+        <div class="cta-label">Bulk Orders Welcome</div>
+        <h2>Ready to <em style="font-style:italic; color:var(--aqua);">Order?</em></h2>
+        <p>Whether for home, business, or events — we supply Haysimo Water wherever you need it. Contact us for bulk pricing and delivery.</p>
+      </div>
+      <a class="btn-primary" onclick="showPage('contact')"><span>Contact Us</span></a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/cropped-WhatsApp_Image_2025-04-02_at_12.04.42_PM-removebg-preview-138x56.png" alt="Haysimo" />
+        <p>Naturally sourced, purely bottled. Haysimo Water — Somalia's finest.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a onclick="showPage('home')">Home</a></li>
+          <li><a onclick="showPage('about')">About Haysimo</a></li>
+          <li><a onclick="showPage('products')">Our Products</a></li>
+          <li><a onclick="showPage('contact')">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📍</span>
+          <span class="footer-contact-text">Bossaso, Puntland, Somalia</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">✉️</span>
+          <span class="footer-contact-text">info@haysimowater.com</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Newsletter</h4>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">Subscribe for new launches.</p>
+        <div class="footer-subscribe">
+          <input type="email" placeholder="Your email" />
+          <button>Join</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 HAYSIMO WATER. All Rights Reserved.</p>
+      <div class="footer-social">
+        <a class="social-btn" href="#">f</a>
+        <a class="social-btn" href="#">in</a>
+        <a class="social-btn" href="#">𝕏</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ===================== CONTACT PAGE ===================== -->
+<div class="page" id="page-contact">
+  <section class="page-hero-sm">
+    <div class="page-hero-sm-bg"></div>
+    <div class="page-hero-sm-img" style="background-image: url('https://haysimowater.com/wp-content/uploads/2025/04/Haysimo-banner-06.png');"></div>
+    <div class="page-hero-sm-content">
+      <div class="section-label">Reach Out</div>
+      <h1>Connect <em>With Us</em></h1>
+      <p>We'd love to hear from you — whether it's a bulk order, a partnership, or simply a question.</p>
+    </div>
+  </section>
+
+  <section class="contact-layout">
+    <div class="contact-info reveal">
+      <div class="section-label">Get in Touch</div>
+      <h2>We're Here<br>to <em>Help</em> You</h2>
+      <div class="section-divider"></div>
+      <p>Whether you're looking to place a bulk order, partner with us, or simply want to learn more about Haysimo Water, our team in Bossaso is ready to assist you.</p>
+
+      <div class="contact-detail">
+        <div class="contact-icon">📍</div>
+        <div>
+          <div class="contact-detail-title">Address</div>
+          <div class="contact-detail-text">Haysimo Water Plant<br>Bossaso, Puntland State, Somalia</div>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-icon">📞</div>
+        <div>
+          <div class="contact-detail-title">Phone</div>
+          <div class="contact-detail-text">444 1177<br>422 4477</div>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-icon">✉️</div>
+        <div>
+          <div class="contact-detail-title">Email</div>
+          <div class="contact-detail-text">info@haysimowater.com</div>
+        </div>
+      </div>
+
+      <div style="margin-top:40px; padding:30px; background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.15);">
+        <div style="font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:10px; font-weight:600;">Business Hours</div>
+        <div style="font-size:0.84rem; color:rgba(255,255,255,0.6); line-height:2;">
+          Saturday – Thursday: 8:00 AM – 6:00 PM<br>
+          Friday: Closed
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-wrap reveal">
+      <div class="form-title">Send Us a Message</div>
+      <form id="contactForm" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" placeholder="Your first name" required />
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" placeholder="Your last name" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" placeholder="your@email.com" required />
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <select>
+            <option>Somalia</option>
+            <option>Kenya</option>
+            <option>Ethiopia</option>
+            <option>Djibouti</option>
+            <option>United Arab Emirates</option>
+            <option>United States</option>
+            <option>United Kingdom</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <select>
+            <option>General Inquiry</option>
+            <option>Product Order</option>
+            <option>Bulk / Wholesale</option>
+            <option>Partnership</option>
+            <option>Media / Press</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message *</label>
+          <textarea placeholder="How can we help you?" required></textarea>
+        </div>
+        <button type="submit" class="form-submit"><span>Send Message →</span></button>
+        <div class="form-success" id="formSuccess">✓ Thank you! Your message has been sent. We'll get back to you shortly.</div>
+      </form>
+    </div>
+  </section>
+
+  <!-- MAP SECTION -->
+  <section class="map-section">
+    <div class="map-inner reveal">
+      <div class="map-text">
+        <h3>Find Us in <em style="font-style:italic; color:var(--aqua);">Bossaso</em></h3>
+        <p>Haysimo Water Plant — Puntland, Somalia</p>
+      </div>
+      <div style="background:rgba(46,134,193,0.1); border:1px solid rgba(46,134,193,0.2); padding:16px 28px; text-align:center;">
+        <div style="font-size:2rem; margin-bottom:8px;">🗺️</div>
+        <div style="font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted);">11.2843° N, 49.1840° E</div>
+        <div style="font-size:0.82rem; color:var(--white); margin-top:4px;">Bossaso, Puntland State, Somalia</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="https://haysimowater.com/wp-content/uploads/2025/04/cropped-WhatsApp_Image_2025-04-02_at_12.04.42_PM-removebg-preview-138x56.png" alt="Haysimo" />
+        <p>Proudly sourced from the heart of Somalia. Experience nature's freshness in every drop.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a onclick="showPage('home')">Home</a></li>
+          <li><a onclick="showPage('about')">About Haysimo</a></li>
+          <li><a onclick="showPage('products')">Our Products</a></li>
+          <li><a onclick="showPage('contact')">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">📍</span>
+          <span class="footer-contact-text">Bossaso, Puntland, Somalia</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="footer-contact-icon">✉️</span>
+          <span class="footer-contact-text">info@haysimowater.com</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Newsletter</h4>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">Subscribe for updates & new launches.</p>
+        <div class="footer-subscribe">
+          <input type="email" placeholder="Your email" />
+          <button>Join</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 HAYSIMO WATER. All Rights Reserved.</p>
+      <div class="footer-social">
+        <a class="social-btn" href="#">f</a>
+        <a class="social-btn" href="#">in</a>
+        <a class="social-btn" href="#">𝕏</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ===== JS ===== -->
+<script>
+  // Loader
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+    }, 1600);
+  });
+
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let mx = 0, my = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+    cursorRing.style.left = mx + 'px';
+    cursorRing.style.top = my + 'px';
+  });
+  document.querySelectorAll('a, button, [onclick]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      cursorRing.style.width = '50px';
+      cursorRing.style.height = '50px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      cursorRing.style.width = '36px';
+      cursorRing.style.height = '36px';
+    });
+  });
+
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Page navigation
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    const navEl = document.getElementById('nav-' + name);
+    if (navEl) navEl.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(initReveal, 100);
+  }
+
+  // Mobile menu
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const ham = document.getElementById('hamburger');
+    menu.classList.toggle('open');
+    ham.classList.toggle('open');
+  }
+
+  // Reveal on scroll
+  function initReveal() {
+    const reveals = document.querySelectorAll('.page.active .reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => {
+      el.classList.remove('visible');
+      observer.observe(el);
+    });
+  }
+  initReveal();
+
+  // Contact form
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.querySelector('.form-submit span');
+    btn.textContent = 'Sending...';
+    setTimeout(() => {
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+    }, 1200);
+  }
+</script>
+</body>
+</html>
